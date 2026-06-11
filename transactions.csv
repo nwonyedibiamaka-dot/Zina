@@ -1,0 +1,17 @@
+Date,Description,Type,Amount,Status
+"Jun 18, 2026","Dividend - Apple Inc.",Credit,"+189000",completed
+"Jun 15, 2026","Wire to Irwin Foundation",Debit,"-250000",completed
+"Jun 12, 2026","Real Estate Dividend",Credit,"+42500",completed
+"Jun 10, 2026","Private Jet Lease",Debit,"-128500",completed
+"Jun 7, 2026","Advisory Fee - MS",Credit,"+75000",completed
+"Jun 3, 2026","Salary Deposit",Credit,"+185000",completed
+"May 28, 2026","Charitable Donation",Debit,"-50000",completed
+"May 25, 2026","Stock Sale - TSLA",Credit,"+342000",completed
+"May 20, 2026","Mortgage Payment",Debit,"-28500",completed
+"May 18, 2026","Dividend - MSFT",Credit,"+112000",completed
+"May 15, 2026","Art Acquisition",Debit,"-450000",completed
+"May 10, 2026","Consulting Income",Credit,"+95000",completed
+"May 5, 2026","Credit Card Payment",Debit,"-12800",completed
+"Apr 30, 2026","Dividend - JPM",Credit,"+74300",completed
+"Apr 25, 2026","Yacht Maintenance",Debit,"-67000",completed
+"Apr 20, 2026","Bonus",Credit,"+425000",completed

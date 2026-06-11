@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Bank of America | Private Wealth — John J. Irwin</title>
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23e31837'/%3E%3Cpath d='M50 25 L70 50 L50 75 L30 50 Z' fill='%23ffffff' opacity='0.95'/%3E%3Ccircle cx='50' cy='50' r='8' fill='%230a2351'/%3E%3C/svg%3E">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 20% 30%, #0a1f3e, #030b17);
+      color: #f1f5f9;
+      transition: background 0.4s, color 0.3s;
+      overflow-x: hidden;
+    }
+    body.light {
+      background: radial-gradient(circle at 20% 30%, #f0f4f8, #e2e8f0);
+      color: #0a2351;
+    }
+    .glass-card {
+      backdrop-filter: blur(16px);
+      border-radius: 2rem;
+      transition: all 0.4s cubic-bezier(0.2,0.9,0.4,1.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .glass-card {
+      background: rgba(15, 25, 45, 0.5);
+      border: 1px solid rgba(227, 24, 55, 0.35);
+      box-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.4);
+    }
+    body.light .glass-card {
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(227, 24, 55, 0.2);
+      box-shadow: 0 15px 30px -12px rgba(0, 0, 0, 0.08);
+    }
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(227, 24, 55, 0.12), transparent);
+      transition: left 0.6s ease;
+      pointer-events: none;
+    }
+    .glass-card:hover::before { left: 100%; }
+    .glass-card:hover {
+      transform: translateY(-6px);
+      border-color: #e31837;
+      box-shadow: 0 25px 40px -15px rgba(227,24,55,0.3);
+    }
+    body.light .glass-card:hover {
+      box-shadow: 0 25px 40px -12px rgba(227,24,55,0.2);
+    }
+    .atm-card {
+      background: linear-gradient(135deg, #0a2351, #051a3e);
+      border-radius: 2rem;
+      padding: 1.8rem;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+      transition: all 0.35s;
+      border: 1px solid rgba(227,24,55,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    body.light .atm-card {
+      background: linear-gradient(135deg, #ffffff, #f5f9ff);
+      color: #0a2351;
+      border: 1px solid rgba(227,24,55,0.25);
+      box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.1);
+    }
+    .card-chip {
+      background: linear-gradient(145deg, #e6c27a, #b28b2c);
+      width: 54px;
+      height: 42px;
+      border-radius: 12px;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .sidebar {
+      width: 280px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      transition: all 0.3s;
+      z-index: 60;
+      overflow-y: auto;
+      background: rgba(10, 35, 81, 0.4);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid rgba(227,24,55,0.2);
+    }
+    body.light .sidebar {
+      background: rgba(255, 255, 255, 0.7);
+      border-right: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .sidebar.collapsed { width: 88px; }
+    .sidebar.collapsed .sidebar-text, .sidebar.collapsed .logo-text { display: none; }
+    .sidebar.collapsed .nav-item { justify-content: center; padding: 0.75rem 0; }
+    .main-content { transition: margin-left 0.3s; margin-left: 280px; }
+    .main-content.expanded { margin-left: 88px; }
+    @media (max-width: 1024px) {
+      .sidebar { transform: translateX(-100%); width: 280px; }
+      .sidebar.mobile-open { transform: translateX(0); }
+      .main-content, .main-content.expanded { margin-left: 0 !important; }
+    }
+    .nav-item {
+      transition: all 0.2s;
+      border-radius: 1rem;
+      cursor: pointer;
+    }
+    .nav-item:hover { background: rgba(227,24,55,0.25); transform: translateX(5px); }
+    .nav-item.active { background: #e31837; color: white; box-shadow: 0 8px 18px rgba(227,24,55,0.4); }
+    .premium-field {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 1.2rem;
+      padding: 0.8rem 1rem;
+      transition: all 0.2s;
+      width: 100%;
+      color: inherit;
+    }
+    body.light .premium-field {
+      background: white;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .premium-field:focus {
+      outline: none;
+      border-color: #e31837;
+      box-shadow: 0 0 0 4px rgba(227,24,55,0.2);
+    }
+    .btn-boa {
+      background: linear-gradient(105deg, #e31837, #a00f28);
+      border: none;
+      transition: all 0.3s;
+      box-shadow: 0 8px 20px rgba(227,24,55,0.4);
+      color: white;
+      font-weight: 700;
+      position: relative;
+      overflow: hidden;
+    }
+    body.light .btn-boa {
+      background: linear-gradient(105deg, #e31837, #c0102a);
+      box-shadow: 0 8px 20px rgba(227,24,55,0.25);
+    }
+    .btn-boa:hover {
+      transform: translateY(-3px);
+      filter: brightness(1.05);
+      box-shadow: 0 15px 25px rgba(227,24,55,0.5);
+    }
+    .bank-logo-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(8px);
+      padding: 0.3rem 1rem;
+      border-radius: 2.5rem;
+      transition: all 0.2s;
+    }
+    body.light .bank-logo-container {
+      background: rgba(0,0,0,0.04);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 2rem;
+      border: 1px solid rgba(16,185,129,0.3);
+    }
+    .otp-digit {
+      width: 65px;
+      height: 75px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 800;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(227,24,55,0.4);
+      border-radius: 1.2rem;
+      color: white;
+      transition: all 0.2s;
+    }
+    body.light .otp-digit { background: white; color: #0a2351; border-color: #e2e8f0; }
+    .otp-digit:focus { outline: none; border-color: #e31837; box-shadow: 0 0 0 3px rgba(227,24,55,0.3); transform: scale(1.02); }
+    .table-wrapper { overflow-x: auto; }
+    .history-table td {
+      background: rgba(255,255,255,0.04);
+      border-radius: 1rem;
+      padding: 1rem 0.5rem;
+    }
+    body.light .history-table td { background: rgba(0,0,0,0.02); }
+    #preloader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 30%, #0a2351, #030c1a);
+      backdrop-filter: blur(10px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease;
+    }
+    body.light #preloader { background: radial-gradient(circle at 20% 30%, #eef2f6, #dce5f0); }
+    .preloader-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(227,24,55,0.2);
+      border-top: 3px solid #e31837;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .preloader-text {
+      font-size: 1.4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #e31837);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-in { animation: fadeSlideUp 0.5s ease-out; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #0a2351; }
+    ::-webkit-scrollbar-thumb { background: #e31837; border-radius: 10px; }
+    body.light ::-webkit-scrollbar-track { background: #cbd5e1; }
+  </style>
+</head>
+<body>
+
+  <div id="preloader">
+    <div class="text-center">
+      <div class="preloader-spinner"></div>
+      <div class="preloader-text">Bank of America</div>
+      <div class="text-xs text-[#d4af37] mt-2">Private Wealth · Secure Access</div>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar flex flex-col p-5">
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 bg-[#e31837] rounded-xl flex items-center justify-center shadow-lg"><i class="fas fa-landmark text-white text-2xl"></i></div>
+        <span class="logo-text font-black text-2xl tracking-tight">Bank of America</span>
+      </div>
+      <button id="toggleSidebarBtn" class="text-white/80 hover:text-white text-xl hidden lg:block"><i class="fas fa-bars"></i></button>
+      <button class="lg:hidden text-white/80" onclick="closeMobileSidebar()"><i class="fas fa-times"></i></button>
+    </div>
+    <nav class="flex-1 space-y-2">
+      <div onclick="switchSection('overview')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold active" data-section="overview"><i class="fas fa-chart-pie w-5"></i><span class="sidebar-text">Overview</span></div>
+      <div onclick="switchSection('transfers')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold" data-section="transfers"><i class="fas fa-exchange-alt w-5"></i><span class="sidebar-text">Transfers</span></div>
+      <div onclick="switchSection('history')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold" data-section="history"><i class="fas fa-clock w-5"></i><span class="sidebar-text">History</span></div>
+      <div onclick="switchSection('insights')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold" data-section="insights"><i class="fas fa-chart-line w-5"></i><span class="sidebar-text">Insights</span></div>
+      <div onclick="switchSection('profile')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold" data-section="profile"><i class="fas fa-user-circle w-5"></i><span class="sidebar-text">Profile</span></div>
+      <div onclick="switchSection('settings')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold" data-section="settings"><i class="fas fa-sliders-h w-5"></i><span class="sidebar-text">Settings</span></div>
+      <div class="border-t border-white/20 my-4"></div>
+      <div onclick="logout()" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-red-400"><i class="fas fa-sign-out-alt w-5"></i><span class="sidebar-text">Logout</span></div>
+    </nav>
+    <div class="pt-4 border-t border-white/20 mt-auto">
+      <button onclick="toggleTheme()" class="flex items-center gap-3 w-full hover:bg-white/10 rounded-xl px-4 py-2.5"><i id="themeIcon" class="fas fa-moon w-5"></i><span id="themeText" class="sidebar-text">Dark Mode</span></button>
+    </div>
+  </aside>
+
+  <div id="mobileOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50" onclick="closeMobileSidebar()"></div>
+
+  <main id="mainContent" class="main-content p-4 md:p-8 pb-32 pt-6">
+    <div id="overview-section" class="section-content animate-in">
+      <div class="flex flex-wrap justify-between items-center gap-4 mb-8" data-aos="fade-up">
+        <div><h1 class="text-3xl md:text-5xl font-black tracking-tight">Welcome, <span class="text-[#e31837]">John J. Irwin</span></h1><p class="text-white/70">Private Wealth · Tier 7 Concierge</p></div>
+        <div class="glass-card px-5 py-3 rounded-2xl text-right"><p class="text-xs uppercase tracking-wider text-white/50">Total Net Worth</p><h2 id="totalNetWorth" class="text-2xl md:text-5xl font-black text-[#e31837]">$87,287,501.67</h2></div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="atm-card"><div class="flex justify-between"><div><div class="card-chip mb-4"></div><p class="text-white/60 text-xs tracking-wider">Platinum Private</p><div class="text-base md:text-2xl font-mono mt-2 font-bold" id="visaNumber">4242 4242 4242 8102</div></div><i class="fab fa-cc-visa text-4xl md:text-5xl text-white/90"></i></div><div class="mt-4"><p class="text-white/50 text-xs">CARDHOLDER</p><p class="font-bold text-lg">JOHN J. IRWIN</p></div></div>
+        <div class="atm-card" style="background: linear-gradient(125deg, #b3122e, #6a0c1a);"><div class="flex justify-between"><div><div class="card-chip mb-4"></div><p class="text-white/70 text-xs tracking-wider">World Elite • Black</p><div class="text-base md:text-2xl font-mono mt-2 font-bold" id="masterNumber">5555 5555 5555 4903</div></div><i class="fab fa-cc-mastercard text-4xl md:text-5xl text-white/90"></i></div><div class="mt-4"><p class="text-white/60 text-xs">CARDHOLDER</p><p class="font-bold text-lg">JOHN J. IRWIN</p></div></div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+        <div class="glass-card p-5"><i class="fas fa-piggy-bank text-3xl text-emerald-400 mb-2"></i><p class="text-white/60 text-sm">Savings</p><p id="savingsBalance" class="text-2xl md:text-3xl font-bold">$28,372,501.00</p></div>
+        <div class="glass-card p-5"><i class="fas fa-wallet text-3xl text-blue-400 mb-2"></i><p class="text-white/60 text-sm">Checking</p><p id="checkingBalance" class="text-2xl md:text-3xl font-bold">$58,915,000.67</p></div>
+        <div class="glass-card p-5"><i class="fas fa-chart-line text-3xl text-violet-400 mb-2"></i><p class="text-white/60 text-sm">Portfolio ROI</p><p id="roiValue" class="text-2xl md:text-3xl font-bold text-emerald-400">+18.7%</p></div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7 glass-card p-5"><h4 class="font-bold text-xl mb-3">Wealth Evolution</h4><canvas id="wealthChart" height="140"></canvas></div>
+        <div class="lg:col-span-5 glass-card p-5"><h4 class="font-bold text-xl mb-3">Recent Activity</h4><div id="recentList" class="space-y-2 max-h-64 overflow-auto"></div></div>
+      </div>
+    </div>
+
+    <div id="transfers-section" class="section-content hidden animate-in">
+      <h2 class="text-3xl font-bold mb-5">Secure Transfer</h2>
+      <div class="glass-card p-6 md:p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div class="md:col-span-2"><h3 class="font-bold text-lg border-l-4 border-[#e31837] pl-3">Sender Information</h3></div>
+          <div><label class="text-sm font-semibold">Full Name</label><input type="text" id="senderName" class="premium-field mt-1" value="John J. Irwin"></div>
+          <div><label class="text-sm font-semibold">Routing Number</label><input type="text" id="senderRouting" class="premium-field mt-1" value="021000322"></div>
+          <div><label class="text-sm font-semibold">Account Number</label><input type="text" id="senderAccount" class="premium-field mt-1" value="****8102"></div>
+          <div><label class="text-sm font-semibold">Identity Password</label><input type="password" id="identityPass" class="premium-field mt-1" placeholder="SecurePass123"></div>
+          <div class="md:col-span-2 mt-2"><h3 class="font-bold text-lg border-l-4 border-[#e31837] pl-3">Recipient Details</h3></div>
+          <div><label class="text-sm font-semibold">Beneficiary *</label><input type="text" id="beneficiary" class="premium-field mt-1"></div>
+          <div><label class="text-sm font-semibold">Routing Number *</label><input type="text" id="recipientRouting" class="premium-field mt-1" oninput="lookupBankByRouting(this.value)"></div>
+          <div class="md:col-span-2">
+            <label class="text-sm font-semibold">Bank Name</label>
+            <div class="flex items-center gap-3 mt-1 flex-wrap">
+              <input type="text" id="bankName" class="premium-field flex-1" readonly placeholder="Will auto-populate">
+              <div id="bankLogoBadge" class="hidden bank-logo-container"></div>
+            </div>
+            <p id="routingFeedback" class="text-xs mt-1 text-amber-400/70 hidden"></p>
+          </div>
+          <div><label class="text-sm font-semibold">Account Number *</label><input type="text" id="recipientAccount" class="premium-field mt-1"></div>
+          <div class="md:col-span-2"><label class="text-sm font-semibold">Amount (USD) *</label><input type="number" id="amount" class="premium-field mt-1" step="0.01"></div>
+          <div class="md:col-span-2"><label class="text-sm font-semibold">Reference</label><textarea id="memo" rows="2" class="premium-field mt-1"></textarea></div>
+          <div><label class="text-sm font-semibold">Processing Date</label><input type="date" id="transferDate" class="premium-field mt-1" value="2026-06-20"></div>
+        </div>
+        <button onclick="startTransfer()" class="btn-boa mt-6 w-full py-3.5 rounded-xl text-lg">Initiate Transfer →</button>
+      </div>
+      <div class="mt-5 glass-card p-4"><h4 class="font-bold mb-2">Quick Beneficiaries</h4><div class="flex gap-2 flex-wrap"><button class="bg-white/10 rounded-full px-3 py-1 text-sm hover:bg-[#e31837]/30 transition" onclick="fillBeneficiary('Irwin Foundation','021000021','8823746')">Irwin Foundation</button><button class="bg-white/10 rounded-full px-3 py-1 text-sm" onclick="fillBeneficiary('Sarah Chen','121000248','98450012')">Sarah Chen</button></div></div>
+    </div>
+
+    <div id="history-section" class="section-content hidden animate-in">
+      <div class="flex flex-wrap justify-between items-center gap-4 mb-5">
+        <h2 class="text-3xl font-bold"><i class="fas fa-history text-[#e31837] mr-2"></i>Transaction History</h2>
+        <div class="flex flex-wrap gap-2">
+          <div class="relative"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" id="searchHistory" class="premium-field pl-9 py-2 text-sm w-48" placeholder="Search"></div>
+          <div class="flex gap-1"><button data-filter="all" class="filter-btn active bg-white/10 px-3 py-1 rounded-full text-sm">All</button><button data-filter="credit" class="filter-btn bg-white/10 px-3 py-1 rounded-full text-sm">Credits</button><button data-filter="debit" class="filter-btn bg-white/10 px-3 py-1 rounded-full text-sm">Debits</button><button data-filter="pending" class="filter-btn bg-white/10 px-3 py-1 rounded-full text-sm">Pending</button></div>
+          <button onclick="exportCSV()" class="bg-white/10 px-3 py-1 rounded-full text-sm hover:bg-white/20 transition"><i class="fas fa-download"></i> Export</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
+        <div class="glass-card p-3 text-center"><p class="text-white/50 text-xs">Total Credits</p><p id="totalCredits" class="text-xl font-bold text-emerald-400">$0</p></div>
+        <div class="glass-card p-3 text-center"><p class="text-white/50 text-xs">Total Debits</p><p id="totalDebits" class="text-xl font-bold text-red-400">$0</p></div>
+        <div class="glass-card p-3 text-center"><p class="text-white/50 text-xs">Pending Approvals</p><p id="pendingCount" class="text-xl font-bold text-yellow-400">0</p></div>
+        <div class="glass-card p-3 text-center"><p class="text-white/50 text-xs">Statement Period</p><p id="statementPeriod" class="text-sm font-bold text-white">Jun 01 - Jun 23</p></div>
+      </div>
+      <div class="glass-card p-5 table-wrapper">
+        <table class="history-table w-full">
+          <thead><tr class="text-white/50 text-xs uppercase border-b border-white/10"><th class="pb-2 text-left">Date</th><th class="pb-2 text-left">Description</th><th class="pb-2 text-left">Reference</th><th class="pb-2 text-left">Type</th><th class="pb-2 text-right">Amount</th><th class="pb-2 text-right">Balance</th><th class="pb-2 text-left">Status</th></td></thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+        <div id="noHistoryMsg" class="text-center py-8 hidden">No transactions found</div>
+      </div>
+    </div>
+
+    <div id="insights-section" class="section-content hidden animate-in"><div class="glass-card p-5"><canvas id="spendingChart" height="200"></canvas></div></div>
+    <div id="profile-section" class="section-content hidden animate-in"><div class="glass-card p-6 flex items-center gap-5"><div class="w-20 h-20 bg-[#e31837] rounded-2xl flex items-center justify-center text-3xl font-bold">JI</div><div><h3 class="text-2xl font-bold">John J. Irwin</h3><p class="text-white/70">Private Wealth · Tier 7 Concierge</p><p><i class="fas fa-envelope"></i> john.irwin@privatebank.com</p></div></div></div>
+    <div id="settings-section" class="section-content hidden animate-in"><div class="glass-card p-6"><div class="flex justify-between"><span class="font-semibold">Two-Factor Auth</span><button class="bg-[#e31837] px-4 py-1 rounded-xl">Enable</button></div></div></div>
+  </main>
+
+  <footer class="fixed bottom-0 left-0 md:left-[280px] right-0 glass-card py-3 px-5 text-sm flex flex-wrap justify-between items-center gap-2 z-30"><div class="flex gap-4"><i class="fab fa-twitter"></i><i class="fab fa-linkedin"></i><i class="fas fa-headset"></i> Support</div><div><i class="fas fa-phone-alt text-[#e31837]"></i> +1 509 616 4403</div><div>© 2026 Bank of America</div></footer>
+
+  <!-- MODALS -->
+  <div class="modal fade" id="otpModal" tabindex="-1" data-bs-backdrop="static"><div class="modal-dialog modal-dialog-centered"><div class="modal-content glass-card"><div class="modal-header border-0"><h5 class="text-xl font-black"><i class="fas fa-shield-alt text-[#e31837]"></i> OTP Verification</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body text-center"><p>Enter 4‑digit code</p><div class="flex justify-center gap-2 my-3"><input type="text" maxlength="1" class="otp-digit" id="otp1" autofocus> <input type="text" maxlength="1" class="otp-digit" id="otp2"> <input type="text" maxlength="1" class="otp-digit" id="otp3"> <input type="text" maxlength="1" class="otp-digit" id="otp4"></div><div id="otpCodeDisplay" class="text-sm bg-white/10 inline-block px-3 py-1 rounded-full"></div><button onclick="resendOTP()" class="text-[#e31837] text-sm mt-2">Resend code</button><div id="otpErrorMsg" class="text-red-400 text-xs mt-2 hidden"></div></div><div class="modal-footer border-0 justify-center"><button onclick="verifyOTP()" class="bg-[#e31837] px-5 py-2 rounded-full font-bold">Verify</button></div></div></div></div>
+  <div class="modal fade" id="confirmModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content glass-card"><div class="modal-header border-0"><h5 class="text-xl font-black">🔐 Confirm Transfer</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="confirmDetails"></div><div class="modal-footer border-0"><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button id="finalConfirmBtn" class="btn btn-warning text-dark fw-bold">Finalize Transfer</button></div></div></div></div>
+  <div class="modal fade" id="pendingModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content glass-card"><div class="modal-header border-0"><h5 class="text-xl font-black text-yellow-400"><i class="fas fa-clock"></i> Transfer Pending</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body text-center"><i class="fas fa-headset text-5xl text-[#e31837] mb-3"></i><div id="pendingModalContent"></div></div><div class="modal-footer border-0 justify-center gap-2"><button class="bg-white/10 px-4 py-2 rounded-full" data-bs-dismiss="modal">Close</button><button onclick="window.location.href='tel:+15096164403'" class="bg-[#e31837] px-4 py-2 rounded-full"><i class="fas fa-phone"></i> Call Support</button></div></div></div></div>
+  <div id="toastMsg" class="fixed bottom-24 right-4 z-50 hidden glass-card px-4 py-2 rounded-xl shadow-xl text-sm"></div>
+
+  <script>
+    AOS.init({ duration: 700, once: true, offset: 20 });
+
+    // Bank database (abbreviated but full in production)
+    const bankDatabase = {
+      "021000021": { name: "JPMorgan Chase Bank", icon: "fa-building-columns", color: "#1e3a8a", logoText: "Chase" },
+      "322271627": { name: "Chase (CA)", icon: "fa-building-columns", color: "#1e3a8a", logoText: "Chase" },
+      "122100024": { name: "Chase (AZ)", icon: "fa-building-columns", color: "#1e3a8a", logoText: "Chase" },
+      "111000614": { name: "Chase (TX)", icon: "fa-building-columns", color: "#1e3a8a", logoText: "Chase" },
+      "267084131": { name: "Chase (FL)", icon: "fa-building-columns", color: "#1e3a8a", logoText: "Chase" },
+      "021000322": { name: "Bank of America", icon: "fa-landmark", color: "#e31837", logoText: "BofA" },
+      "121000358": { name: "BofA (CA)", icon: "fa-landmark", color: "#e31837", logoText: "BofA" },
+      "111000025": { name: "BofA (TX)", icon: "fa-landmark", color: "#e31837", logoText: "BofA" },
+      "063100277": { name: "BofA (FL)", icon: "fa-landmark", color: "#e31837", logoText: "BofA" },
+      "051000017": { name: "BofA (VA)", icon: "fa-landmark", color: "#e31837", logoText: "BofA" },
+      "026009593": { name: "BofA (Wire)", icon: "fa-landmark", color: "#e31837", logoText: "BofA" },
+      "121000248": { name: "Wells Fargo Bank", icon: "fa-building", color: "#b91c1c", logoText: "Wells Fargo" },
+      "121042882": { name: "Wells Fargo (CA)", icon: "fa-building", color: "#b91c1c", logoText: "Wells Fargo" },
+      "122105278": { name: "Wells Fargo (AZ)", icon: "fa-building", color: "#b91c1c", logoText: "Wells Fargo" },
+      "111900659": { name: "Wells Fargo (TX)", icon: "fa-building", color: "#b91c1c", logoText: "Wells Fargo" },
+      "062000080": { name: "Wells Fargo (AL)", icon: "fa-building", color: "#b91c1c", logoText: "Wells Fargo" },
+      "021000089": { name: "Citibank N.A.", icon: "fa-university", color: "#0e4d6e", logoText: "Citi" },
+      "322271724": { name: "Citibank (CA)", icon: "fa-university", color: "#0e4d6e", logoText: "Citi" },
+      "111000017": { name: "Citibank (TX)", icon: "fa-university", color: "#0e4d6e", logoText: "Citi" },
+      "071000013": { name: "PNC Bank", icon: "fa-piggy-bank", color: "#f7b32b", logoText: "PNC" },
+      "043000096": { name: "PNC (Wire)", icon: "fa-piggy-bank", color: "#f7b32b", logoText: "PNC" },
+      "031100089": { name: "PNC (PA)", icon: "fa-piggy-bank", color: "#f7b32b", logoText: "PNC" },
+      "122105278": { name: "U.S. Bank", icon: "fa-flag-checkered", color: "#004b8d", logoText: "US Bank" },
+      "071004200": { name: "U.S. Bank (Wire)", icon: "fa-flag-checkered", color: "#004b8d", logoText: "US Bank" },
+      "102000021": { name: "U.S. Bank (CO)", icon: "fa-flag-checkered", color: "#004b8d", logoText: "US Bank" },
+      "061000104": { name: "Truist Bank", icon: "fa-tree", color: "#00857c", logoText: "Truist" },
+      "053000196": { name: "Truist (NC)", icon: "fa-tree", color: "#00857c", logoText: "Truist" },
+      "051405515": { name: "Capital One", icon: "fa-credit-card", color: "#004977", logoText: "Capital One" },
+      "056073612": { name: "Capital One (VA)", icon: "fa-credit-card", color: "#004977", logoText: "Capital One" },
+      "031101266": { name: "TD Bank", icon: "fa-leaf", color: "#4C9F38", logoText: "TD Bank" },
+      "054001725": { name: "TD Bank (MD)", icon: "fa-leaf", color: "#4C9F38", logoText: "TD Bank" },
+      "042000314": { name: "Fifth Third Bank", icon: "fa-landmark", color: "#0052CC", logoText: "Fifth Third" },
+      "062000019": { name: "Regions Bank", icon: "fa-university", color: "#003087", logoText: "Regions" },
+      "044000037": { name: "Huntington Bank", icon: "fa-building-columns", color: "#00AEEF", logoText: "Huntington" },
+      "041215537": { name: "KeyBank", icon: "fa-key", color: "#003087", logoText: "KeyBank" },
+      "021300077": { name: "Citizens Bank", icon: "fa-university", color: "#E30613", logoText: "Citizens" },
+      "081501696": { name: "First Horizon Bank", icon: "fa-landmark", color: "#003087", logoText: "First Horizon" },
+      "053000219": { name: "First Citizens Bank", icon: "fa-flag-usa", color: "#003087", logoText: "First Citizens" },
+      "021906471": { name: "Santander Bank", icon: "fa-building-columns", color: "#EA1C2D", logoText: "Santander" },
+      "043002900": { name: "BMO Bank", icon: "fa-leaf", color: "#003087", logoText: "BMO" },
+      "123103716": { name: "Zions Bancorporation", icon: "fa-university", color: "#003087", logoText: "Zions" },
+      "124003116": { name: "Ally Bank", icon: "fa-car", color: "#00AEEF", logoText: "Ally" },
+      "031100869": { name: "Comerica Bank", icon: "fa-building-columns", color: "#003087", logoText: "Comerica" },
+      "122000247": { name: "MUFG Union Bank", icon: "fa-university", color: "#003087", logoText: "MUFG" },
+      "022000046": { name: "HSBC Bank", icon: "fa-globe", color: "#DB0011", logoText: "HSBC" },
+      "021200025": { name: "Deutsche Bank", icon: "fa-building-columns", color: "#001E62", logoText: "Deutsche" },
+      "272471852": { name: "Flagstar Bank", icon: "fa-flag", color: "#003087", logoText: "Flagstar" },
+      "114000093": { name: "Frost Bank", icon: "fa-snowflake", color: "#003087", logoText: "Frost" },
+      "075000019": { name: "Associated Bank", icon: "fa-handshake", color: "#003087", logoText: "Associated" }
+    };
+
+    function lookupBankByRouting(routingNumber) {
+      const bankField = document.getElementById('bankName');
+      const badgeContainer = document.getElementById('bankLogoBadge');
+      const feedback = document.getElementById('routingFeedback');
+      if (!routingNumber || routingNumber.trim() === "") {
+        bankField.value = ""; badgeContainer.classList.add('hidden'); feedback.classList.add('hidden'); return;
+      }
+      const bankInfo = bankDatabase[routingNumber.trim()];
+      if (bankInfo) {
+        bankField.value = bankInfo.name;
+        badgeContainer.innerHTML = `<i class="fas ${bankInfo.icon} bank-icon" style="color: ${bankInfo.color};"></i><span class="font-semibold" style="color: ${bankInfo.color};">${bankInfo.logoText}</span><span class="verified-badge"><i class="fas fa-check-circle"></i> Verified</span>`;
+        badgeContainer.classList.remove('hidden'); feedback.classList.add('hidden'); bankField.style.borderColor = "#10b981";
+      } else {
+        bankField.value = ""; badgeContainer.classList.add('hidden');
+        feedback.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Routing number not recognized. Please verify.`;
+        feedback.classList.remove('hidden'); bankField.style.borderColor = "#f59e0b";
+      }
+    }
+    function fillBeneficiary(name, routing, acc) { document.getElementById('beneficiary').value = name; document.getElementById('recipientRouting').value = routing; document.getElementById('recipientAccount').value = acc; lookupBankByRouting(routing); }
+    function randomCardNum(p) { let n = p; for (let i = 0; i < 15; i++) n += Math.floor(Math.random() * 10); return n.match(/.{1,4}/g).join(' '); }
+    document.getElementById('visaNumber').innerText = randomCardNum('4'); document.getElementById('masterNumber').innerText = randomCardNum('5');
+
+    let transactions = [
+      {date:"Jun 22, 2026", desc:"Wire Transfer - International Settlement", ref:"WIR-INT-9921", type:"credit", amount:25632000, status:"completed"},
+      {date:"Jun 20, 2026", desc:"TikTok Monetization - Creator Fund", ref:"TT-MON-4452", type:"credit", amount:14000000, status:"completed"},
+      {date:"Jun 18, 2026", desc:"Dividend - Apple Inc.", ref:"DIV-APL-8923", type:"credit", amount:189000, status:"completed"},
+      {date:"Jun 15, 2026", desc:"Wire to Irwin Foundation", ref:"WIR-IF-4451", type:"debit", amount:250000, status:"completed"},
+      {date:"Jun 12, 2026", desc:"Real Estate Dividend", ref:"DIV-REIT-1203", type:"credit", amount:42500, status:"completed"},
+      {date:"Jun 10, 2026", desc:"Private Jet Lease", ref:"LSE-NJ-7782", type:"debit", amount:128500, status:"completed"},
+      {date:"Jun 7, 2026", desc:"Advisory Fee - MS", ref:"ADV-MS-5612", type:"credit", amount:75000, status:"completed"},
+      {date:"Jun 3, 2026", desc:"Salary Deposit", ref:"DEP-SAL-2345", type:"credit", amount:185000, status:"completed"},
+      {date:"May 28, 2026", desc:"Charitable Donation", ref:"CHR-RC-9081", type:"debit", amount:50000, status:"completed"},
+      {date:"May 25, 2026", desc:"Stock Sale - TSLA", ref:"STK-TSLA-4567", type:"credit", amount:342000, status:"completed"},
+      {date:"May 20, 2026", desc:"Mortgage Payment", ref:"MTG-0123", type:"debit", amount:28500, status:"completed"},
+      {date:"May 18, 2026", desc:"Dividend - MSFT", ref:"DIV-MSFT-7890", type:"credit", amount:112000, status:"completed"},
+      {date:"May 15, 2026", desc:"Art Acquisition", ref:"ART-SOT-3344", type:"debit", amount:450000, status:"completed"},
+      {date:"May 10, 2026", desc:"Consulting Income", ref:"CON-INC-5566", type:"credit", amount:95000, status:"completed"},
+      {date:"May 5, 2026", desc:"Credit Card Payment", ref:"CC-AMEX-9876", type:"debit", amount:12800, status:"completed"},
+      {date:"Apr 30, 2026", desc:"Dividend - JPM", ref:"DIV-JPM-1234", type:"credit", amount:74300, status:"completed"},
+      {date:"Apr 25, 2026", desc:"Yacht Maintenance", ref:"YCH-MNT-7788", type:"debit", amount:67000, status:"completed"},
+      {date:"Apr 20, 2026", desc:"Year-End Bonus", ref:"BNS-2026-01", type:"credit", amount:425000, status:"completed"}
+    ];
+
+    let currentChecking = 18915000.67 + 25632000 + 14000000;
+    let currentSavings = 28372501.00;
+    let totalNet = currentChecking + currentSavings;
+    let wealthData = [38700000,40200000,41850000,43520000,45200000,totalNet];
+    let wealthChart, spendingChart;
+
+    function formatMoney(v){ return "$"+v.toLocaleString(undefined,{minimumFractionDigits:2}); }
+    function refreshUI(){
+      document.getElementById('totalNetWorth').innerText = formatMoney(totalNet);
+      document.getElementById('savingsBalance').innerText = formatMoney(currentSavings);
+      document.getElementById('checkingBalance').innerText = formatMoney(currentChecking);
+      document.getElementById('roiValue').innerHTML = "+18.7%";
+      const recent = document.getElementById('recentList');
+      if(recent) recent.innerHTML = transactions.slice(0,5).map(t=>`<div class="flex justify-between p-2 glass-card rounded-lg"><div><span class="font-semibold text-sm">${t.desc}</span><p class="text-xs opacity-60">${t.date}</p></div><div class="font-bold ${t.type==='credit'?'text-emerald-400':'text-red-400'}">${t.type==='credit'?'+':'-'}${formatMoney(t.amount)}</div></div>`).join('');
+      if(wealthChart) wealthChart.destroy();
+      wealthChart = new Chart(document.getElementById('wealthChart'),{type:'line',data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'Net Worth',data:wealthData,borderColor:'#e31837',borderWidth:3,tension:0.3,fill:false}]}});
+      if(spendingChart) spendingChart.destroy();
+      const ctx = document.getElementById('spendingChart');
+      if(ctx) spendingChart = new Chart(ctx,{type:'doughnut',data:{labels:['Lifestyle','Investments','Real Estate','Travel','Charity'],datasets:[{data:[285000,750000,450000,128500,50000],backgroundColor:['#e31837','#0a2351','#d4af37','#10b981','#8b5cf6']}]}});
+      renderHistoryTable();
+      setTimeout(()=>{ let p = document.getElementById('preloader'); if(p){ p.style.opacity='0'; setTimeout(()=>p.style.display='none',500); } },600);
+    }
+
+    function addPendingTransaction(amount,beneficiary,memo,date,ref){
+      transactions.unshift({date:date||"Today",desc:`⏳ PENDING: Transfer to ${beneficiary} - Call +1 509 616 4403 | Ref: ${ref}`,ref:ref,type:"debit",amount:amount,status:"pending"});
+      refreshUI();
+    }
+    function showToast(msg,type){ let t=document.getElementById('toastMsg'); t.innerHTML=`<i class="fas ${type==='error'?'fa-exclamation-circle':'fa-check-circle'}"></i> ${msg}`; t.classList.remove('hidden'); setTimeout(()=>t.classList.add('hidden'),4000); }
+    let currentOTP=null, transferData=null;
+    function generateOTP(){ return Math.floor(1000+Math.random()*9000).toString(); }
+    function resendOTP(){ currentOTP=generateOTP(); document.getElementById('otpCodeDisplay').innerText=`Your OTP: ${currentOTP}`; showToast(`New OTP: ${currentOTP}`,'info'); document.querySelectorAll('.otp-digit').forEach(i=>i.value=''); document.getElementById('otpErrorMsg').classList.add('hidden'); }
+    function startTransfer(){
+      if(document.getElementById('identityPass').value!=="SecurePass123"){ showToast("Invalid identity. Demo: SecurePass123",'error'); return; }
+      let amt=parseFloat(document.getElementById('amount').value), ben=document.getElementById('beneficiary').value.trim(), bank=document.getElementById('bankName').value.trim(), routing=document.getElementById('recipientRouting').value.trim(), acc=document.getElementById('recipientAccount').value.trim();
+      if(isNaN(amt)||amt<=0){ showToast("Valid amount required",'error'); return; }
+      if(!ben||!bank||!routing||!acc){ showToast("Complete recipient details",'error'); return; }
+      if(amt>currentChecking){ showToast(`Insufficient funds: ${formatMoney(currentChecking)}`,'error'); return; }
+      transferData={amount:amt,beneficiary:ben,bank,bankRouting:routing,account:acc,memo:document.getElementById('memo').value,date:document.getElementById('transferDate').value||"Today"};
+      currentOTP=generateOTP(); document.getElementById('otpCodeDisplay').innerText=`Your OTP: ${currentOTP}`; document.querySelectorAll('.otp-digit').forEach(i=>i.value=''); document.getElementById('otpErrorMsg').classList.add('hidden');
+      new bootstrap.Modal(document.getElementById('otpModal')).show();
+    }
+    function verifyOTP(){
+      let entered=`${document.getElementById('otp1').value}${document.getElementById('otp2').value}${document.getElementById('otp3').value}${document.getElementById('otp4').value}`;
+      if(entered!==currentOTP){ document.getElementById('otpErrorMsg').innerText=`Invalid OTP. Correct: ${currentOTP}`; document.getElementById('otpErrorMsg').classList.remove('hidden'); return; }
+      bootstrap.Modal.getInstance(document.getElementById('otpModal')).hide();
+      // Impressive confirmation modal content
+      document.getElementById('confirmDetails').innerHTML = `
+        <div class="bg-green-500/20 p-3 rounded-xl mb-3 text-center"><i class="fas fa-check-circle text-2xl text-emerald-400"></i><p class="font-bold mt-1">OTP Verified Successfully</p></div>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between"><span class="text-white/60">Beneficiary:</span><span class="font-semibold">${transferData.beneficiary}</span></div>
+          <div class="flex justify-between"><span class="text-white/60">Bank:</span><span class="font-semibold">${transferData.bank}</span></div>
+          <div class="flex justify-between"><span class="text-white/60">Amount:</span><span class="text-[#e31837] font-black text-lg">${formatMoney(transferData.amount)}</span></div>
+          <div class="flex justify-between"><span class="text-white/60">Processing Date:</span><span>${transferData.date}</span></div>
+          <div class="flex justify-between"><span class="text-white/60">Reference Memo:</span><span>${transferData.memo || '—'}</span></div>
+        </div>
+        <div class="bg-yellow-500/20 p-3 rounded-lg mt-3 text-sm"><i class="fas fa-shield-alt mr-2"></i> <strong>Security Notice:</strong> This high‑value transfer will be placed in a pending queue and requires verbal confirmation from our Private Banking team before final settlement.</div>
+      `;
+      new bootstrap.Modal(document.getElementById('confirmModal')).show();
+    }
+    document.getElementById('finalConfirmBtn').onclick = () => {
+      if(transferData){
+        const refNum = `BOA-${Math.floor(Math.random()*1000000)}`;
+        addPendingTransaction(transferData.amount, transferData.beneficiary, transferData.memo, transferData.date, refNum);
+        // Impressive pending modal content
+        document.getElementById('pendingModalContent').innerHTML = `
+          <p class="text-lg font-bold mb-2">High‑Value Transfer Verification Required</p>
+          <p class="text-sm text-white/80">For your security, this transaction has been temporarily held.</p>
+          <div class="bg-yellow-500/20 p-3 rounded-xl my-3">
+            <p class="text-sm font-semibold">Please contact our Private Banking Concierge immediately:</p>
+            <p class="text-2xl font-mono font-bold text-[#e31837] my-1">+1 509 616 4403</p>
+            <p class="text-xs">Reference ID: <span class="font-mono">${refNum}</span></p>
+          </div>
+          <p class="text-xs text-white/60">Our team is standing by 24/7 to verify your identity and release your funds.</p>
+        `;
+        const pendingModal = new bootstrap.Modal(document.getElementById('pendingModal'));
+        pendingModal.show();
+        document.getElementById('amount').value = '';
+        transferData = null;
+        bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+        switchSection('overview');
+      }
+    };
+    let currentFilter='all', currentSearch='';
+    function renderHistoryTable(){
+      let filtered = [...transactions];
+      if(currentFilter==='credit') filtered=filtered.filter(t=>t.type==='credit');
+      else if(currentFilter==='debit') filtered=filtered.filter(t=>t.type==='debit');
+      else if(currentFilter==='pending') filtered=filtered.filter(t=>t.status==='pending');
+      if(currentSearch.trim()) filtered=filtered.filter(t=>t.desc.toLowerCase().includes(currentSearch.toLowerCase()) || t.ref.toLowerCase().includes(currentSearch.toLowerCase()));
+      const tbody=document.getElementById('historyBody'), noMsg=document.getElementById('noHistoryMsg');
+      if(filtered.length===0){ tbody.innerHTML=''; noMsg.classList.remove('hidden'); } else { noMsg.classList.add('hidden');
+        let balance = totalNet;
+        tbody.innerHTML = [...filtered].reverse().map(t => {
+          balance = t.type === 'credit' ? balance - t.amount : balance + t.amount;
+          return `<tr class="border-b border-white/5 hover:bg-white/5 transition"><td class="text-sm">${t.date}<\/td><td class="text-sm font-medium">${t.desc}<\/td><td class="text-xs font-mono text-white/50">${t.ref}<\/td><td class="${t.type==='credit'?'text-emerald-400':'text-red-400'} text-sm">${t.type==='credit'?'Credit':'Debit'}<\/td><td class="text-right font-bold ${t.type==='credit'?'text-emerald-400':'text-red-400'}">${t.type==='credit'?'+':'-'}${formatMoney(t.amount)}<\/td><td class="text-right font-mono text-white/70">${formatMoney(balance)}<\/td><td class="text-xs">${t.status==='pending'?'<span class="status-pending"><i class="fas fa-clock"></i> Pending</span>':'<span class="status-completed"><i class="fas fa-check-circle"></i> Completed</span>'}<\/td><\/tr>`;
+        }).join('');
+      }
+      document.getElementById('totalCredits').innerText = formatMoney(transactions.filter(t=>t.type==='credit'&&t.status==='completed').reduce((s,t)=>s+t.amount,0));
+      document.getElementById('totalDebits').innerText = formatMoney(transactions.filter(t=>t.type==='debit'&&t.status==='completed').reduce((s,t)=>s+t.amount,0));
+      document.getElementById('pendingCount').innerText = transactions.filter(t=>t.status==='pending').length;
+    }
+    function exportCSV(){
+      let csv = "Date,Description,Reference,Type,Amount,Balance,Status\n";
+      let balance = totalNet;
+      [...transactions].reverse().forEach(t => {
+        balance = t.type === 'credit' ? balance - t.amount : balance + t.amount;
+        csv += `"${t.date}","${t.desc}","${t.ref}",${t.type==='credit'?'Credit':'Debit'},"${t.type==='credit'?'+':'-'}${t.amount}","${balance}",${t.status}\n`;
+      });
+      const blob = new Blob([csv], {type:'text/csv'}), url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = 'statement.csv'; a.click(); URL.revokeObjectURL(url);
+      showToast('Statement exported','info');
+    }
+    function setupHistoryEvents(){
+      document.querySelectorAll('.filter-btn').forEach(btn=>{ btn.addEventListener('click',()=>{ document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); currentFilter=btn.getAttribute('data-filter'); renderHistoryTable(); }); });
+      document.getElementById('searchHistory').addEventListener('input',e=>{ currentSearch=e.target.value; renderHistoryTable(); });
+    }
+    function switchSection(s){
+      document.querySelectorAll('.section-content').forEach(el=>el.classList.add('hidden'));
+      document.getElementById(`${s}-section`).classList.remove('hidden');
+      document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+      document.querySelector(`.nav-item[data-section="${s}"]`).classList.add('active');
+      if(s==='overview' && wealthChart) wealthChart.update();
+      if(s==='history') renderHistoryTable();
+    }
+    function toggleTheme(){ document.body.classList.toggle('light'); let icon=document.getElementById('themeIcon'), txt=document.getElementById('themeText'); if(document.body.classList.contains('light')){ icon.className='fas fa-sun'; txt.innerText='Light Mode'; }else{ icon.className='fas fa-moon'; txt.innerText='Dark Mode'; } }
+    function logout(){ alert("Logged out."); window.location.reload(); }
+    let sidebarCollapsed=false; const sidebar=document.getElementById('sidebar'), main=document.getElementById('mainContent');
+    document.getElementById('toggleSidebarBtn').onclick=()=>{ sidebarCollapsed=!sidebarCollapsed; if(sidebarCollapsed){ sidebar.classList.add('collapsed'); main.classList.add('expanded'); }else{ sidebar.classList.remove('collapsed'); main.classList.remove('expanded'); } };
+    function openMobileSidebar(){ document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('mobileOverlay').classList.remove('hidden'); }
+    function closeMobileSidebar(){ document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('mobileOverlay').classList.add('hidden'); }
+    window.onload=()=>{ refreshUI(); switchSection('overview'); setupHistoryEvents(); const mobileBtn=document.createElement('button'); mobileBtn.innerHTML='<i class="fas fa-bars text-2xl"></i>'; mobileBtn.className='lg:hidden fixed top-4 left-4 z-50 glass-card p-2 rounded-xl shadow-lg'; mobileBtn.onclick=openMobileSidebar; document.body.appendChild(mobileBtn); document.querySelectorAll('.otp-digit').forEach((inp,idx,arr)=>{ inp.oninput=(e)=>{ if(e.target.value.length===1 && idx<3) arr[idx+1].focus(); }; inp.onkeydown=(e)=>{ if(e.key==='Backspace' && idx>0 && !e.target.value) arr[idx-1].focus(); }; }); };
+  </script>
+</body>
+</html>
